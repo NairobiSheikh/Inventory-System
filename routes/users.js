@@ -1,6 +1,10 @@
 //users that longin and register goes here
+const e = require('express');
 const express = require('express');
 const router = express.Router();
+
+//user model
+const user= require('../models/user');
 
 //Longin page
 router.get('/login', (req, res) => res.render('login'));
@@ -36,7 +40,23 @@ router.post('/register', (req, res) => {
       password2
     });
   }else {
-    res.send('pass');
+    //validation is passing
+    user.findOne( { email: email })
+      .then(user => {
+        if(user) {
+          //user exists
+          errors.push({ msg: 'Email is already registered' });
+          res.render('register', {
+            errors,
+            name,
+            email,
+            password,
+            password2
+          });
+        } else {
+          
+        }
+      });
   }
 });
 
