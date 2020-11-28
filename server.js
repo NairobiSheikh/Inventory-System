@@ -1,9 +1,15 @@
 const express = require('express');
+const expressLoyouts = require('express-ejs-layouts')
 
 const app = express();
 
+// adding middleware: EJS
+app.use(expressLoyouts);
+app.set('view engine', 'ejs');
+
 //Routes
 app.use('/', require('./routes/index'));
+app.use('/users', require('./routes/users'));
 
 const PORT = process.env.PORT || 5000;
 
