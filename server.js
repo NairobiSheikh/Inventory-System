@@ -1,7 +1,16 @@
 const express = require('express');
 const expressLoyouts = require('express-ejs-layouts')
+const mongoose = require('mongoose');
 
 const app = express();
+
+// // DB Config
+const db = require('./config/keys').MongoURI;
+
+// Connect to MongoDB
+mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB Connected...'))
+  .catch(err => console.log(err));
 
 // adding middleware: EJS
 app.use(expressLoyouts);
