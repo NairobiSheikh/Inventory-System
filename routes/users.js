@@ -1,5 +1,4 @@
 //users that longin and register goes here
-const e = require('express');
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
@@ -14,7 +13,7 @@ router.get('/login', (req, res) => res.render('login'));
 router.get('/register', (req, res) => res.render('register'));
 
 // Register Handle
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   // console.log(req.body)
   // res.send('Hello World!!');
   const {
@@ -52,36 +51,29 @@ router.post('/register', (req, res) => {
       password2
     });
   } else {
-    console.log(User);
-    debugger
     //validation is passing
-    User.findOne({
-        email: email
-      },
-      function (error, input) {
-        if (error) {
-          //User exists
-          errors.push({
-            msg: 'Email is already registered'
-          });
-          res.render('register', {
-            errors,
-            name,
-            email,
-            password,
-            password2
-          });
-        } else {
-          console.log(User);
-          console.log('here');
-          User.create({
-            name: name,
-            email: email,
-            password: password
-          });
-        }
-      }
-    );
+    if (await User.exists({ email: email })) {
+      //User exists
+      errors.push({
+        msg: 'Email is already registered'
+      });
+      res.render('register', {
+        errors,
+        name,
+        email,
+        password,
+        password2
+      });
+    } else {
+      var test = new User({
+        name,
+        email,
+        password
+      });
+      test.save();
+      res.send('Hellloooo');
+    }
   }
 });
+
 module.exports = router;
