@@ -2,9 +2,10 @@
 const e = require('express');
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 
 //user model
-const user= require('../models/user');
+const User = require('../models/user');
 
 //Longin page
 router.get('/login', (req, res) => res.render('login'));
@@ -16,19 +17,30 @@ router.get('/register', (req, res) => res.render('register'));
 router.post('/register', (req, res) => {
   // console.log(req.body)
   // res.send('Hello World!!');
-  const { name, email, password, password2 } = req.body;
+  const {
+    name,
+    email,
+    password,
+    password2
+  } = req.body;
   let errors = [];
 
   if (!name || !email || !password || !password2) {
-    errors.push({ msg: 'Please enter all fields' });
+    errors.push({
+      msg: 'Please enter all fields'
+    });
   }
 
   if (password != password2) {
-    errors.push({ msg: 'Passwords do not match' });
+    errors.push({
+      msg: 'Passwords do not match'
+    });
   }
 
   if (password.length < 6) {
-    errors.push({ msg: 'Password must be at least 6 characters' });
+    errors.push({
+      msg: 'Password must be at least 6 characters'
+    });
   }
 
   if (errors.length > 0) {
@@ -39,13 +51,19 @@ router.post('/register', (req, res) => {
       password,
       password2
     });
-  }else {
+  } else {
+    console.log(User);
+    debugger
     //validation is passing
-    user.findOne( { email: email })
-      .then(user => {
-        if(user) {
-          //user exists
-          errors.push({ msg: 'Email is already registered' });
+    User.findOne({
+        email: email
+      },
+      function (error, input) {
+        if (error) {
+          //User exists
+          errors.push({
+            msg: 'Email is already registered'
+          });
           res.render('register', {
             errors,
             name,
@@ -54,10 +72,16 @@ router.post('/register', (req, res) => {
             password2
           });
         } else {
-          
+          console.log(User);
+          console.log('here');
+          User.create({
+            name: name,
+            email: email,
+            password: password
+          });
         }
-      });
+      }
+    );
   }
 });
-
 module.exports = router;
