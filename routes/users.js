@@ -70,10 +70,43 @@ router.post('/register', async (req, res) => {
         email,
         password
       });
-      test.save();
-      res.send('Hellloooo');
+      // test.save();
+      //Hash Password
+      bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(test.password, salt, (err, hash) => {
+          if (err) throw err;
+          test.password = hash;
+          test.save()
+            .then(user => {
+              // message once you registered 
+              req.flash(
+                'success_msg',
+                'You are now registered and can log in'
+              );
+              //Redirect after message displays
+              res.redirect('/users/login');
+            })
+            .catch(err => console.log(err));
+        });
+      });
     }
   }
+});
+
+// Login
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', {
+    successRedirect: '/dashboard',
+    failureRedirect: '/users/login',
+    failureFlash: true
+  })(req, res, next);
+});
+
+// Logout
+router.get('/logout', (req, res) => {
+  req.logout();
+  req.flash('success_msg', 'You are logged out');
+  res.redirect('/users/login');
 });
 
 module.exports = router;
